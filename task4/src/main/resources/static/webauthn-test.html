@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebAuthn Registration Test</title>
+</head>
+<body>
+<h2>WebAuthn Registration Test</h2>
+<button id="registerBtn">Register</button>
+<script>
+const username = "Virajg";
+const email = "gajeraviraj520@gmail.com";
+const deviceName = "My Laptop";
+/**
+ * Convert Base64URL string → Uint8Array
+ */
+function base64UrlToUint8Array(base64UrlString) {
+    const padding = '='.repeat((4 - base64UrlString.length % 4) % 4);
+    const base64 = (base64UrlString + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+/**
+ * Convert ArrayBuffer → Base64URL string
+ */
+function arrayBufferToBase64Url(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary)
+        .replace(/\+/g, '-')  // Base64URL safe
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+}
+document.getElementById("registerBtn").addEventListener("click", async () => {
+    try {
+        // :one: Call backend to get registration options
+        // const startResp = await fetch("http://192.168.10.139:8080/api/auth/register/start", {
+        const startResp = await fetch("http://localhost:8080/api/auth/register/start", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email })
+        });
+        if (!startResp.ok) throw new Error(`Failed: ${startResp.statusText}`);
+        const options = await startResp.json();
+        console.log("Registration options:", options);
+        // :two: Decode binary fields (challenge, user.id)
+        options.challenge = base64UrlToUint8Array(options.challenge);
+        options.user.id = base64UrlToUint8Array(options.user.id);
+        // Convert excludeCredentials if present
+        if (options.excludeCredentials) {
+            options.excludeCredentials = options.excludeCredentials.map(cred => ({
+                ...cred,
+                id: base64UrlToUint8Array(cred.id)
+            }));
+        }
+        // :three: Call WebAuthn API (browser)
+        const credential = await navigator.credentials.create({ publicKey: options });
+        console.log("Credential created:", credential);
+        // :four: Convert credential for sending to backend (Base64URL)
+        // const credentialJSON = {
+        //     id: credential.id,
+        //     rawId: arrayBufferToBase64Url(credential.rawId),
+        //     type: credential.type,
+        //     response: {
+        //         attestationObject: arrayBufferToBase64Url(credential.response.attestationObject),
+        //         clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON)
+        //     },
+        //     clientExtensionResults: credential.getClientExtensionResults()
+        // };
+        // console.log("Credential JSON:", credentialJSON);
+        // :five: Send credential to backend for verification
+        // const finishResp = await fetch("http://192.168.10.139:8080/api/auth/register/finish", {
+        const finishResp = await fetch("http://localhost:8080/api/auth/register/finish", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username,
+                email,
+                credential: JSON.stringify(credential),
+                deviceName
+            })
+        });
+        const result = await finishResp.json();
+        console.log("Backend response:", result);
+        if (result.error) {
+            alert(":x: Registration failed: " + result.error);
+        } else {
+            alert(":white_tick: Registration successful for user: " + result.username);
+        }
+    } catch (err) {
+        console.error("Error:", err);
+        alert("Registration failed — check console for details.");
+    }
+});
+</script>
+</body>
+</html>
