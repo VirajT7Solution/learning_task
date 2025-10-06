@@ -1,5 +1,6 @@
 package com.task1.auth.request;
 
+import com.task1.auth.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,4 +15,5 @@ public class AuthResponse {
     private String refreshToken;
     private String tokenType = "Bearer";
     private long expiresInSeconds;
+    private User user;
 }
