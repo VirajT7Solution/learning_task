@@ -1,5 +1,6 @@
-package com.task3.model;
+package com.task3.security;
 
+import com.task3.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

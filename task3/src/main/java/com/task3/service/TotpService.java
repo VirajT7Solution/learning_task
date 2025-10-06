@@ -1,4 +1,4 @@
-package com.task3.model;
+package com.task3.service;
 
 import dev.samstevens.totp.code.*;
 import dev.samstevens.totp.exceptions.QrGenerationException;

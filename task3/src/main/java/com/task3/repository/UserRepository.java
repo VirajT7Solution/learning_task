@@ -1,5 +1,6 @@
-package com.task3.model;
+package com.task3.repository;
 
+import com.task3.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;

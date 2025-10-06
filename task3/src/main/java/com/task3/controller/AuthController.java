@@ -1,5 +1,7 @@
-package com.task3.model;
+package com.task3.controller;
 
+import com.task3.model.*;
+import com.task3.service.AuthService;
 import dev.samstevens.totp.exceptions.QrGenerationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,5 +1,7 @@
-package com.task3.model;
+package com.task3.service;
 
+import com.task3.model.*;
+import com.task3.repository.UserRepository;
 import dev.samstevens.totp.exceptions.QrGenerationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,4 +1,4 @@
-package com.task3.model;
+package com.task3.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
