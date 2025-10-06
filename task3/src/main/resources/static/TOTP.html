@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOTP Authentication - Complete Test Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .section:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+
+        .section h2 {
+            color: #333;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .response-box {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .response-box pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .token-display {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            margin-top: 10px;
+            border: 1px solid #b3d9ff;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin: 25px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 3px dashed #667eea;
+        }
+
+        .qr-code {
+            max-width: 280px;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .secret-code {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid #ffc107;
+        }
+
+        .secret-code strong {
+            display: block;
+            margin-bottom: 10px;
+            color: #856404;
+        }
+
+        .secret-code code {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            color: #856404;
+            font-weight: bold;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .instructions {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            margin: 20px 0;
+        }
+
+        .instructions strong {
+            color: #667eea;
+            font-size: 16px;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin: 10px 0;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-logged-in {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-logged-out {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-totp-enabled {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .config-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #667eea;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .info-icon {
+            cursor: help;
+            color: #667eea;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .flex-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .flex-buttons button {
+            flex: 1;
+        }
+
+        h3 {
+            color: #667eea;
+            margin: 20px 0 10px 0;
+            font-size: 16px;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🔐 TOTP Authentication Test Suite</h1>
+        <p>Complete Testing Interface for Spring Boot TOTP Implementation</p>
+    </div>
+
+    <div class="content">
+        <!-- Configuration Section -->
+        <div class="config-section">
+            <h2 style="color: #667eea; margin-bottom: 15px;">⚙️ API Configuration</h2>
+            <div class="form-group">
+                <label>API Base URL</label>
+                <input type="text" id="apiUrl" value="http://localhost:8080" placeholder="http://localhost:8080">
+            </div>
+            <div style="margin-top: 15px;">
+                <strong>Status:</strong>
+                <span id="loginStatus" class="status-badge status-logged-out">Not Logged In</span>
+                <span id="totpStatus" class="status-badge status-logged-out hidden">TOTP Disabled</span>
+            </div>
+            <div id="currentToken" class="hidden">
+                <strong style="display: block; margin-top: 15px; color: #667eea;">Current JWT Token:</strong>
+                <div class="token-display" id="tokenDisplay"></div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Register Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <h2>Register New User</h2>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="regUsername" placeholder="john_doe" value="testuser">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" placeholder="john@example.com" value="test@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="SecurePass123!" value="Password123!">
+                </div>
+                <button onclick="register()">📝 Register User</button>
+                <div id="registerResponse"></div>
+            </div>
+
+            <!-- Login Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <h2>Login</h2>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="loginUsername" placeholder="john_doe" value="testuser">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="SecurePass123!" value="Password123!">
+                </div>
+                <div class="form-group">
+                    <label>TOTP Code <span class="info-icon" title="Leave empty if TOTP not enabled yet">ℹ️</span></label>
+                    <input type="text" id="loginTotpCode" placeholder="123456 (optional)" maxlength="6">
+                </div>
+                <button onclick="login()">🔓 Login</button>
+                <div id="loginResponse"></div>
+            </div>
+
+            <!-- Setup TOTP Section -->
+            <div class="section full-width">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <h2>Setup TOTP (2FA)</h2>
+                </div>
+                <div class="alert alert-info">
+                    <strong>⚠️ Important:</strong> You must be logged in to setup TOTP
+                </div>
+                <button onclick="setupTotp()">🔑 Generate QR Code & Secret</button>
+                <div id="totpSetupResponse"></div>
+
+                <div id="qrSection" class="hidden">
+                    <div class="divider"></div>
+
+                    <div class="instructions">
+                        <strong>📱 How to Setup Your Authenticator App:</strong>
+                        <ol>
+                            <li><strong>Download an app:</strong> Google Authenticator, Microsoft Authenticator, or Authy</li>
+                            <li><strong>Open the app</strong> and tap the "+" or "Add Account" button</li>
+                            <li><strong>Select "Scan QR Code"</strong> or "Scan Barcode"</li>
+                            <li><strong>Point your camera</strong> at the QR code below</li>
+                            <li><strong>The app will show a 6-digit code</strong> that changes every 30 seconds</li>
+                        </ol>
+                    </div>
+
+                    <div class="qr-container">
+                        <h3 style="margin-top: 0; color: #667eea;">Scan this QR Code:</h3>
+                        <img id="qrCode" class="qr-code" alt="QR Code">
+                    </div>
+
+                    <div class="secret-code">
+                        <strong>🔐 Manual Entry Secret Key:</strong>
+                        <code id="secretCode"></code>
+                        <p style="margin-top: 10px; font-size: 13px; color: #856404;">
+                            Use this if you can't scan the QR code. Enter it manually in your authenticator app.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verify TOTP Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <h2>Verify & Enable TOTP</h2>
+                </div>
+                <div class="alert alert-warning">
+                    <strong>📲 Look at your authenticator app</strong> for the 6-digit code
+                </div>
+                <div class="form-group">
+                    <label>Enter 6-Digit Code from Authenticator App</label>
+                    <input type="text" id="verifyCode" placeholder="123456" maxlength="6" style="font-size: 24px; text-align: center; letter-spacing: 5px;">
+                </div>
+                <button onclick="verifyTotp()">✅ Verify & Enable TOTP</button>
+                <div id="verifyResponse"></div>
+            </div>
+
+            <!-- Test Protected Endpoint -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <h2>Test Protected Endpoint</h2>
+                </div>
+                <div class="alert alert-info">
+                    This endpoint requires authentication (JWT token)
+                </div>
+                <button onclick="testProtected()">🛡️ Get Profile</button>
+                <div id="profileResponse"></div>
+            </div>
+
+            <!-- Disable TOTP Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <h2>Disable TOTP</h2>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Your Password</label>
+                    <input type="password" id="disablePassword" placeholder="Your password">
+                </div>
+                <button onclick="disableTotp()" class="btn-danger">🚫 Disable TOTP</button>
+                <div id="disableResponse"></div>
+            </div>
+
+            <!-- All Endpoints Overview -->
+            <div class="section full-width">
+                <div class="section-header">
+                    <div class="section-number">📋</div>
+                    <h2>API Endpoints Overview</h2>
+                </div>
+                <div class="response-box">
+                        <pre>
+<strong>Available Endpoints:</strong>
+
+1. POST /api/auth/register
+   Body: { "username": "...", "email": "...", "password": "..." }
+
+2. POST /api/auth/login
+   Body: { "username": "...", "password": "...", "totpCode": "..." }
+
+3. POST /api/auth/totp/setup
+   Headers: Authorization: Bearer {token}
+
+4. POST /api/auth/totp/verify
+   Headers: Authorization: Bearer {token}
+   Body: { "code": "123456" }
+
+5. GET /api/auth/profile
+   Headers: Authorization: Bearer {token}
+
+6. POST /api/auth/totp/disable
+   Headers: Authorization: Bearer {token}
+   Body: { "password": "..." }
+                        </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let authToken = '';
+    let currentUsername = '';
+
+    function updateStatus() {
+        const loginStatus = document.getElementById('loginStatus');
+        const totpStatus = document.getElementById('totpStatus');
+        const tokenDiv = document.getElementById('currentToken');
+        const tokenDisplay = document.getElementById('tokenDisplay');
+
+        if (authToken) {
+            loginStatus.textContent = `✅ Logged in as: ${currentUsername}`;
+            loginStatus.className = 'status-badge status-logged-in';
+            tokenDiv.classList.remove('hidden');
+            tokenDisplay.textContent = authToken;
+        } else {
+            loginStatus.textContent = '❌ Not Logged In';
+            loginStatus.className = 'status-badge status-logged-out';
+            tokenDiv.classList.add('hidden');
+        }
+    }
+
+    async function register() {
+        const apiUrl = document.getElementById('apiUrl').value;
+        const username = document.getElementById('regUsername').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+
+        if (!username || !email || !password) {
+            showResponse('registerResponse', { error: 'All fields are required' }, false);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${apiUrl}/api/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            const data = await response.json();
+            showResponse('registerResponse', data, response.ok);
+
+            if (response.ok) {
+                document.getElementById('loginUsername').value = username;
+                document.getElementById('loginPassword').value = password;
+            }
+        } catch (error) {
+            showResponse('registerResponse', { error: error.message }, false);
+        }
+    }
+
+    async function login() {
+        const apiUrl = document.getElementById('apiUrl').value;
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+        const totpCode = document.getElementById('loginTotpCode').value;
+
+        if (!username || !password) {
+            showResponse('loginResponse', { error: 'Username and password are required' }, false);
+            return;
+        }
+
+        try {
+            const body = { username, password };
+            if (totpCode) body.totpCode = totpCode;
+
+            const response = await fetch(`${apiUrl}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            const data = await response.json();
+
+            if (data.token) {
+                authToken = data.token;
+                currentUsername = username;
+                updateStatus();
+                showResponse('loginResponse', {
+                    message: data.message,
+                    totpRequired: data.totpRequired,
+                    note: '✅ Login successful! Token saved. You can now use protected endpoints.'
+                }, true);
+
+                if (data.totpRequired) {
+                    document.getElementById('totpStatus').textContent = '✅ TOTP Enabled';
+                    document.getElementById('totpStatus').className = 'status-badge status-totp-enabled';
+                    document.getElementById('totpStatus').classList.remove('hidden');
+                }
+            } else {
+                showResponse('loginResponse', data, response.ok);
+            }
+        } catch (error) {
+            showResponse('loginResponse', { error: error.message }, false);
+        }
+    }
+
+    async function setupTotp() {
+        if (!authToken) {
+            showResponse('totpSetupResponse', {
+                error: '❌ Please login first',
+                hint: 'Go to Step 2 and login with your credentials'
+            }, false);
+            return;
+        }
+
+        const apiUrl = document.getElementById('apiUrl').value;
+
+        try {
+            const response = await fetch(`${apiUrl}/api/auth/totp/setup`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.qrCodeUri) {
+                document.getElementById('qrCode').src = data.qrCodeUri;
+                document.getElementById('secretCode').textContent = data.secret;
+                document.getElementById('qrSection').classList.remove('hidden');
+                showResponse('totpSetupResponse', {
+                    message: '✅ QR Code generated successfully!',
+                    instruction: 'Scroll down to see the QR code and scan it with your authenticator app'
+                }, true);
+
+                // Scroll to QR section
+                setTimeout(() => {
+                    document.getElementById('qrSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            } else {
+                showResponse('totpSetupResponse', data, false);
+            }
+        } catch (error) {
+            showResponse('totpSetupResponse', { error: error.message }, false);
+        }
+    }
+
+    async function verifyTotp() {
+        if (!authToken) {
+            showResponse('verifyResponse', {
+                error: '❌ Please login first',
+                hint: 'Go to Step 2 and login with your credentials'
+            }, false);
+            return;
+        }
+
+        const apiUrl = document.getElementById('apiUrl').value;
+        const code = document.getElementById('verifyCode').value;
+
+        if (!code || code.length !== 6) {
+            showResponse('verifyResponse', {
+                error: '❌ Please enter a valid 6-digit code',
+                hint: 'Open your authenticator app and enter the current code'
+            }, false);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${apiUrl}/api/auth/totp/verify`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code })
+            });
+
+            const data = await response.json();
+            showResponse('verifyResponse', data, response.ok);
+
+            if (response.ok && data.verified) {
+                document.getElementById('totpStatus').textContent = '✅ TOTP Enabled';
+                document.getElementById('totpStatus').className = 'status-badge status-totp-enabled';
+                document.getElementById('totpStatus').classList.remove('hidden');
+
+                showResponse('verifyResponse', {
+                    ...data,
+                    nextStep: 'Now logout and login again with TOTP code to test 2FA authentication!'
+                }, true);
+            }
+        } catch (error) {
+            showResponse('verifyResponse', { error: error.message }, false);
+        }
+    }
+
+    async function testProtected() {
+        if (!authToken) {
+            showResponse('profileResponse', {
+                error: '❌ Please login first',
+                hint: 'Go to Step 2 and login with your credentials'
+            }, false);
+            return;
+        }
+
+        const apiUrl = document.getElementById('apiUrl').value;
+
+        try {
+            const response = await fetch(`${apiUrl}/api/auth/profile`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.text();
+                showResponse('profileResponse', {
+                    message: data,
+                    status: 'Authentication successful! ✅'
+                }, true);
+            } else {
+                showResponse('profileResponse', {
+                    error: 'Access denied',
+                    status: response.status
+                }, false);
+            }
+        } catch (error) {
+            showResponse('profileResponse', { error: error.message }, false);
+        }
+    }
+
+    async function disableTotp() {
+        if (!authToken) {
+            showResponse('disableResponse', {
+                error: '❌ Please login first'
+            }, false);
+            return;
+        }
+
+        const apiUrl = document.getElementById('apiUrl').value;
+        const password = document.getElementById('disablePassword').value;
+
+        if (!password) {
+            showResponse('disableResponse', {
+                error: '❌ Password is required to disable TOTP'
+            }, false);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${apiUrl}/api/auth/totp/disable`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ password })
+            });
+
+            const data = await response.text();
+            showResponse('disableResponse', {
+                message: data,
+                note: response.ok ? 'TOTP has been disabled. You can now login without 2FA.' : null
+            }, response.ok);
+
+            if (response.ok) {
+                document.getElementById('totpStatus').textContent = '❌ TOTP Disabled';
+                document.getElementById('totpStatus').className = 'status-badge status-logged-out';
+                document.getElementById('qrSection').classList.add('hidden');
+            }
+        } catch (error) {
+            showResponse('disableResponse', { error: error.message }, false);
+        }
+    }
+
+    function showResponse(elementId, data, success) {
+        const element = document.getElementById(elementId);
+        const alertClass = success ? 'alert-success' : 'alert-error';
+
+        let content = '';
+        if (typeof data === 'object') {
+            content = JSON.stringify(data, null, 2);
+        } else {
+            content = data;
+        }
+
+        element.innerHTML = `
+                <div class="alert ${alertClass}">
+                    <pre>${content}</pre>
+                </div>
+            `;
+    }
+
+    // Auto-fill for testing
+    window.addEventListener('load', () => {
+        updateStatus();
+        console.log('TOTP Test Suite loaded successfully!');
+        console.log('Make sure your Spring Boot application is running on:', document.getElementById('apiUrl').value);
+    });
+</script>
+</body>
+</html>
