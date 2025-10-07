@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title>Home</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="jumbotron bg-light p-5 rounded">
+        <h1 class="display-4">Welcome to User Management System</h1>
+        <p class="lead">A secure Spring Boot application with CSRF protection and user management features.</p>
+        <hr class="my-4">
+        <p>Features include:</p>
+        <ul>
+            <li>Secure user authentication</li>
+            <li>CSRF protection</li>
+            <li>User creation and management</li>
+            <li>Password encryption</li>
+            <li>Session management</li>
+        </ul>
+        <div class="mt-4">
+            <a class="btn btn-primary btn-lg" th:href="@{/users/create}" role="button">Create User</a>
+            <a class="btn btn-outline-secondary btn-lg" th:href="@{/users/list}" role="button">View Users</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
