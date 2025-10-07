@@ -77,7 +77,7 @@ public class AuthController {
                 .expiryDate(Instant.ofEpochMilli(jwtService.extractExpiration(refreshJwt).getTime()).plusMillis(0))
                 .revoked(false)
                 .build();
-        refreshTokenService.createRefreshToken(user, refreshToken.getExpiryDate()); // we create another opaque token here
+        refreshTokenService.createRefreshToken(refreshToken); // we create another opaque token here
         // For simplicity, return the JWT refresh token we issued above. In production use opaque DB-backed tokens or rotating tokens.
 
         user.setPassword(null);

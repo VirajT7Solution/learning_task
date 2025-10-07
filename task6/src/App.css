@@ -1,42 +1,75 @@
+/* App specific styles */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Dashboard or main app styles can go here */
+.dashboard {
+  flex: 1;
   padding: 2rem;
+  background: #f8fafc;
+}
+
+/* Auth container styles */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.auth-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-header {
   text-align: center;
+  margin-bottom: 2rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.auth-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.auth-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.auth-subtitle {
+  color: #6b7280;
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .auth-container {
+    padding: 1rem;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  
+  .auth-card {
+    padding: 1.5rem;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }

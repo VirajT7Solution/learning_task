@@ -5,8 +5,16 @@ export interface User {
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
+  expiresInSeconds: string;
   user?: User;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresInSeconds: string;
 }
 
 export interface LoginRequest {

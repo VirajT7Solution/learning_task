@@ -16,14 +16,8 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     // create and persist a refresh token for a user
-    public RefreshToken createRefreshToken(User user, Instant expiryDate) {
-        RefreshToken token = RefreshToken.builder()
-                .token(UUID.randomUUID().toString() + "." + UUID.randomUUID().toString())
-                .user(user)
-                .expiryDate(expiryDate)
-                .revoked(false)
-                .build();
-        return refreshTokenRepository.save(token);
+    public RefreshToken createRefreshToken(RefreshToken refreshToken) {
+        return refreshTokenRepository.save(refreshToken);
     }
 
     public void revokeRefreshToken(RefreshToken token) {
