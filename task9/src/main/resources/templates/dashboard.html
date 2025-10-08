@@ -15,24 +15,39 @@
         </a>
         <div class="navbar-nav ms-auto">
                 <span class="navbar-text me-3">
-                    Welcome, [[${#authentication.name}]]!
+                    Welcome, [[${user.name}]]!
                 </span>
-            <a class="nav-link" th:href="@{/logout}">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-link nav-link" style="border: none; background: none;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </div>
     </div>
 </nav>
 
 <div class="container mt-4">
+    <!-- Welcome Message -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4 class="alert-heading">
+                    <i class="fas fa-user-graduate"></i> Welcome to Your Personal Library, [[${user.name}]]!
+                </h4>
+                <p class="mb-0">This is your personal book collection. Only you can see and manage the books you add here.</p>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
+        <!-- Total Books Card -->
         <div class="col-md-3">
             <div class="card bg-primary text-white mb-4">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h4>[[${totalBooks}]]</h4>
-                            <p>Total Books</p>
+                            <h2>[[${totalBooks}]]</h2>
+                            <p>Total Books in Your Collection</p>
                         </div>
                         <div class="align-self-center">
                             <i class="fas fa-book fa-2x"></i>
@@ -42,12 +57,13 @@
             </div>
         </div>
 
+        <!-- Available Books Card -->
         <div class="col-md-3">
             <div class="card bg-success text-white mb-4">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h4>[[${availableBooks}]]</h4>
+                            <h2>[[${availableBooks}]]</h2>
                             <p>Available Books</p>
                         </div>
                         <div class="align-self-center">
@@ -57,24 +73,63 @@
                 </div>
             </div>
         </div>
+
+        <!-- User Info Card -->
+        <div class="col-md-6">
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-user text-primary"></i> Student Information
+                    </h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Name:</strong> [[${user.name}]]<br>
+                            <strong>Email:</strong> [[${user.email}]]
+                        </div>
+                        <div class="col-6">
+                            <strong>Role:</strong>
+                            <span class="badge bg-info">[[${user.role}]]</span><br>
+                            <strong>Member Since:</strong> Recently
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Quick Actions -->
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Quick Actions</h5>
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-rocket"></i> Quick Actions
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <a th:href="@{/books}" class="btn btn-primary w-100">
-                                <i class="fas fa-book"></i> Manage Books
+                            <a th:href="@{/books}" class="btn btn-primary w-100 py-3">
+                                <i class="fas fa-book fa-2x mb-2"></i><br>
+                                Manage My Books
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a th:href="@{/books}" class="btn btn-success w-100">
-                                <i class="fas fa-plus"></i> Add New Book
+                            <a th:href="@{/books}" class="btn btn-success w-100 py-3">
+                                <i class="fas fa-plus fa-2x mb-2"></i><br>
+                                Add New Book
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a th:href="@{/books}" class="btn btn-info w-100 py-3">
+                                <i class="fas fa-search fa-2x mb-2"></i><br>
+                                Search Books
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a th:href="@{/logout}" class="btn btn-secondary w-100 py-3">
+                                <i class="fas fa-home fa-2x mb-2"></i><br>
+                                Back to Home
                             </a>
                         </div>
                     </div>

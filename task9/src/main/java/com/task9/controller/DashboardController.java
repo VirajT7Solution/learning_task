@@ -21,9 +21,15 @@ public class DashboardController {
     @GetMapping("/dashboard")
     public String dashboard(Model model, Authentication authentication) {
         User user = userService.findByEmail(authentication.getName());
+
+        // Get user-specific statistics
+        long totalBooks = bookService.getBooksByUser(user).size();
+        long availableBooks = bookService.getAvailableBooksByUser(user).size();
+
         model.addAttribute("user", user);
-        model.addAttribute("totalBooks", bookService.getBooksByUser(user).size());
-        model.addAttribute("availableBooks", bookService.getAvailableBooks().size());
+        model.addAttribute("totalBooks", totalBooks);
+        model.addAttribute("availableBooks", availableBooks);
+
         return "dashboard";
     }
 }
