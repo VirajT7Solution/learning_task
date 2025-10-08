@@ -8,48 +8,59 @@
 <body>
 <div layout:fragment="content">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Login</h4>
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Login to Your Account</h4>
                 </div>
                 <div class="card-body">
-                    <!-- Display login error -->
-                    <div th:if="${param.error}" class="alert alert-danger">
+                    <!-- Error Message -->
+                    <div th:if="${param.error}" class="alert alert-danger" role="alert">
                         Invalid username or password.
                     </div>
 
-                    <!-- Display logout message -->
-                    <div th:if="${param.logout}" class="alert alert-success">
+                    <!-- Logout Message -->
+                    <div th:if="${param.logout}" class="alert alert-success" role="alert">
                         You have been logged out successfully.
                     </div>
 
-                    <!-- Display session expired message -->
-                    <div th:if="${param.expired}" class="alert alert-warning">
-                        Your session has expired. Please login again.
+                    <!-- Registration Success Message -->
+                    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                        <span th:text="${successMessage}"></span>
                     </div>
 
-                    <!-- Login Form with CSRF -->
-                    <form th:action="@{/login}" method="post">
-                        <!-- CSRF Token - Automatically handled by Thymeleaf + Spring Security -->
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-
+                    <form method="post" th:action="@{/login}">
+                        <!-- Username -->
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
                             <input type="text" class="form-control" id="username" name="username"
                                    placeholder="Enter your username" required>
                         </div>
 
+                        <!-- Password -->
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password"
                                    placeholder="Enter your password" required>
                         </div>
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Login</button>
+                        <!-- CSRF Token is automatically included by Thymeleaf -->
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">Login</button>
+                            <a th:href="@{/users/register}" class="btn btn-outline-primary">Don't have an account? Register</a>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Security Info -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h6>🔐 Secure Authentication</h6>
+                    <p class="small text-muted mb-0">
+                        Your credentials are securely validated. Passwords are encrypted and CSRF protection is enabled.
+                    </p>
                 </div>
             </div>
         </div>

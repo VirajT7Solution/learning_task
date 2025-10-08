@@ -20,46 +20,36 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                // Configure authorization
+        return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/users/create", "/users/list",
-                                "/css/**", "/js/**", "/images/**").permitAll()
+                        // Public endpoints
+                        .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/users/create", "/users/register").permitAll() // Allow user registration
+                        .requestMatchers("/users/list").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
-
-                // CSRF Configuration - ENABLED by default
-                .csrf(csrf -> csrf
-                                // Use cookie-based CSRF tokens for better compatibility
-                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        // You can add URLs to ignore CSRF if needed (not recommended for forms)
-                        // .ignoringRequestMatchers("/api/**")
-                )
-
-                // Form login configuration
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .permitAll()
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/users/list", true)
                         .failureUrl("/login?error=true")
+                        .permitAll()
                 )
-
-                // Logout configuration
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
+                        .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
-
-                // Session management
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
                 .sessionManagement(session -> session
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false)
                         .expiredUrl("/login?expired=true")
-                );
-
-        return http.build();
+                )
+                .build();
     }
 }
