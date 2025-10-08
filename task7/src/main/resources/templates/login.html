@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title>Login</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Login to Your Account</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Error Message -->
+                    <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                        Invalid username or password.
+                    </div>
+
+                    <!-- Logout Message -->
+                    <div th:if="${param.logout}" class="alert alert-success" role="alert">
+                        You have been logged out successfully.
+                    </div>
+
+                    <!-- Registration Success Message -->
+                    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                        <span th:text="${successMessage}"></span>
+                    </div>
+
+                    <form method="post" th:action="@{/login}">
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   placeholder="Enter your username" required>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   placeholder="Enter your password" required>
+                        </div>
+
+                        <!-- CSRF Token is automatically included by Thymeleaf -->
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">Login</button>
+                            <a th:href="@{/users/register}" class="btn btn-outline-primary">Don't have an account? Register</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Security Info -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h6>🔐 Secure Authentication</h6>
+                    <p class="small text-muted mb-0">
+                        Your credentials are securely validated. Passwords are encrypted and CSRF protection is enabled.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

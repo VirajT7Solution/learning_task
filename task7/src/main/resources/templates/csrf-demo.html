@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title>CSRF Protection Demo</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>CSRF Protection Demonstration</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5>Protected Form (With CSRF Token)</h5>
+                </div>
+                <div class="card-body">
+                    <p>This form includes a CSRF token automatically:</p>
+                    <form method="post" th:action="@{/api/demo-action}">
+                        <!-- CSRF Token will be automatically included by Thymeleaf -->
+                        <div class="mb-3">
+                            <label class="form-label">Test Data</label>
+                            <input type="text" class="form-control" name="testData" value="Safe data">
+                        </div>
+                        <button type="submit" class="btn btn-success">Submit Protected Form</button>
+                    </form>
+                    <small class="text-muted">This will work because Thymeleaf automatically adds the CSRF token.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5>Unprotected Form (No CSRF Token)</h5>
+                </div>
+                <div class="card-body">
+                    <p>This form does NOT include a CSRF token:</p>
+                    <form method="post" action="/api/demo-action">
+                        <div class="mb-3">
+                            <label class="form-label">Test Data</label>
+                            <input type="text" class="form-control" name="testData" value="Unsafe data">
+                        </div>
+                        <button type="submit" class="btn btn-danger">Submit Unprotected Form</button>
+                    </form>
+                    <small class="text-muted">This will fail with a 403 error because there's no CSRF token.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Manual CSRF Token Inclusion</h5>
+        </div>
+        <div class="card-body">
+            <p>You can manually include CSRF tokens like this:</p>
+            <pre><code>&lt;input type="hidden"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}" /&gt;</code></pre>
+
+            <form method="post" th:action="@{/api/demo-action}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <div class="mb-3">
+                    <label class="form-label">Manual CSRF Example</label>
+                    <input type="text" class="form-control" name="manualData">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Manual CSRF Form</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
